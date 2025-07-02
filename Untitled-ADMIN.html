@@ -1,0 +1,506 @@
+<!-- user_chat.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat met Admin</title>
+  <style>
+    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
+    #chat { border: 1px solid #ccc; background: #fff; padding: 10px; height: 200px; overflow-y: scroll; }
+    input, button { padding: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Chat met Admin</h2>
+  <div id="chat"></div>
+  <input type="text" id="msg" placeholder="Typ je bericht..." />
+  <button onclick="sendMessage()">Stuur</button>
+
+  <script>
+    function sendMessage() {
+      const input = document.getElementById("msg");
+      const message = input.value;
+      if (!message) return;
+      const chat = document.getElementById("chat");
+
+      // Toon bericht
+      chat.innerHTML += "<p><strong>Jij:</strong> " + message + "</p>";
+
+      // Sla op in localStorage
+      const messages = JSON.parse(localStorage.getItem("chat")) || [];
+      messages.push({ from: "user", text: message });
+      localStorage.setItem("chat", JSON.stringify(messages));
+
+      input.value = "";
+    }
+
+    // Laad oude berichten
+    const messages = JSON.parse(localStorage.getItem("chat")) || [];
+    messages.forEach(msg => {
+      if (msg.from === "user") {
+        document.getElementById("chat").innerHTML += `<p><strong>Jij:</strong> ${msg.text}</p>`;
+      } else {
+        document.getElementById("chat").innerHTML += `<p><strong>Admin:</strong> ${msg.text}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
+<!-- admin_chat.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Chat</title>
+  <style>
+    body { font-family: Arial; background: #f7f7f7; padding: 20px; }
+    #chat { border: 1px solid #aaa; background: #fff; padding: 10px; height: 250px; overflow-y: scroll; }
+    input, button { padding: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Admin Dashboard Chat</h2>
+  <div id="chat"></div>
+  <input type="text" id="adminMsg" placeholder="Typ antwoord..." />
+  <button onclick="sendAdminMsg()">Beantwoord</button>
+
+  <script>
+    const chatBox = document.getElementById("chat");
+
+    function loadMessages() {
+      chatBox.innerHTML = "";
+      const messages = JSON.parse(localStorage.getItem("chat")) || [];
+      messages.forEach(msg => {
+        const who = msg.from === "user" ? "Gebruiker" : "Admin";
+        chatBox.innerHTML += `<p><strong>${who}:</strong> ${msg.text}</p>`;
+      });
+    }
+
+    function sendAdminMsg() {
+      const input = document.getElementById("adminMsg");
+      const message = input.value;
+      if (!message) return;
+
+      const messages = JSON.parse(localStorage.getItem("chat")) || [];
+      messages.push({ from: "admin", text: message });
+      localStorage.setItem("chat", JSON.stringify(messages));
+      input.value = "";
+      loadMessages();
+    }
+
+    // Laad bij het starten
+    loadMessages();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat met Admin</title>
+</head>
+<body>
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Chat</title>
+</head>
+<body>
+  <h2>Admin Panel - Chat</h2>
+  <div>
+    <strong>Bericht van gebruiker:</strong><br />
+    <p id="userMsgBox"></p>
+  </div>
+
+  <form id="adminForm">
+    <input type="text" id="adminReply" placeholder="Typ je antwoord..." required />
+    <button type="submit">Antwoord Versturen</button>
+  </form>
+
+  <script>
+    // Toon gebruikersbericht
+    const userMsg = localStorage.getItem("userMessage");
+    document.getElementById("userMsgBox").innerText = userMsg ? userMsg : "Geen berichten ontvangen.";
+
+    // Admin stuurt antwoord terug
+    document.getElementById("adminForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const reply = document.getElementById("adminReply").value;
+      localStorage.setItem("adminReply", reply);
+      alert("Antwoord verzonden!");
+    });
+  </script>
+</body>
+</html>
+<!-- admin.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RBXFits Admin - Winkelmandjes</title>
+</head>
+<body>
+  <h1>Ontvangen Winkelmandjes</h1>
+  <ul id="orders"></ul>
+
+  <script>
+    const orders = JSON.parse(localStorage.getItem("rbx_cart")) || [];
+    const orderList = document.getElementById("orders");
+
+    if (orders.length === 0) {
+      orderList.innerHTML = "<li>Geen bestellingen ontvangen.</li>";
+    } else {
+      orders.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - ${item.price} Robux`;
+        orderList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - RBXFits</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #f4f7fc;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: #1e40af; /* Donkerblauw */
+      padding: 1rem 2rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+    }
+    header h1 {
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+    }
+    header button {
+      background-color: #2563eb; /* Lichter blauw */
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    header button:hover {
+      background-color: #3b82f6;
+    }
+    main {
+      flex-grow: 1;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    h2 {
+      color: #1e40af;
+      margin-bottom: 1rem;
+      letter-spacing: 1.5px;
+    }
+    .search-container {
+      margin-bottom: 1rem;
+      max-width: 400px;
+    }
+    .search-container input {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border: 2px solid #1e40af;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    .search-container input:focus {
+      border-color: #2563eb;
+      outline: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(30, 64, 175, 0.1);
+    }
+    thead {
+      background-color: #1e40af;
+      color: white;
+    }
+    th, td {
+      padding: 1rem 1.2rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      font-size: 1rem;
+    }
+    tbody tr:hover {
+      background-color: #f0f5ff;
+      cursor: default;
+    }
+    @media (max-width: 768px) {
+      main {
+        padding: 1rem;
+      }
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr {
+        display: none;
+      }
+      tbody tr {
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      tbody td {
+        padding-left: 50%;
+        position: relative;
+      }
+      tbody td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 1rem;
+        top: 1rem;
+        font-weight: 700;
+        color: #1e40af;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>RBXFits Admin</h1>
+    <button id="logoutBtn">Uitloggen</button>
+  </header>
+
+  <main>
+    <h2>Bestellingen Overzicht</h2>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Zoek op naam, e-mail of product..." />
+    </div>
+
+    <table id="ordersTable" aria-label="Bestellingen tabel">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Klant Naam</th>
+          <th>E-mail</th>
+          <th>Product</th>
+          <th>Aantal</th>
+          <th>Datum</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data komt hier via JS -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    // Dummy data - dit vervang je met echte bestellingen uit je backend
+    const orders = [
+      {id: '001', name: 'Jan Jansen', email: 'jan@example.com', product: 'RBX Hoodie', quantity: 2, date: '2025-06-30', status: 'Verzonden'},
+      {id: '002', name: 'Sofie de Vries', email: 'sofie.v@example.com', product: 'RBX T-shirt', quantity: 1, date: '2025-06-29', status: 'In behandeling'},
+      {id: '003', name: 'Kees Bakker', email: 'kees.bakker@example.com', product: 'RBX Pet', quantity: 3, date: '2025-06-28', status: 'Verzonden'},
+      {id: '004', name: 'Lotte Maas', email: 'lotte.maas@example.com', product: 'RBX Jacket', quantity: 1, date: '2025-06-27', status: 'Geannuleerd'},
+      {id: '005', name: 'Mohamed Ali', email: 'mohamed.ali@example.com', product: 'RBX Hoodie', quantity: 1, date: '2025-06-26', status: 'In behandeling'},
+    ];
+
+    const tbody = document.querySelector('#ordersTable tbody');
+    const searchInput = document.getElementById('searchInput');
+
+    // Functie om orders in tabel te tonen
+    function displayOrders(filteredOrders) {
+      tbody.innerHTML = ''; // Maak leeg
+      if (filteredOrders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 1rem;">Geen bestellingen gevonden.</td></tr>';
+        return;
+      }
+      filteredOrders.forEach(order => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td data-label="Order ID">${order.id}</td>
+          <td data-label="Klant Naam">${order.name}</td>
+          <td data-label="E-mail">${order.email}</td>
+          <td data-label="Product">${order.product}</td>
+          <td data-label="Aantal">${order.quantity}</td>
+          <td data-label="Datum">${order.date}</td>
+          <td data-label="Status">${order.status}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Filter functie zoeken
+    function filterOrders() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const filtered = orders.filter(order => {
+        return (
+          order.name.toLowerCase().includes(searchTerm) ||
+          order.email.toLowerCase().includes(searchTerm) ||
+          order.product.toLowerCase().includes(searchTerm)
+        );
+      });
+      displayOrders(filtered);
+    }
+
+    searchInput.addEventListener('input', filterOrders);
+
+    // Uitloggen knop (voorbeeld functie)
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      alert('Uitloggen...');
+      // Hier zet je jouw uitlogfunctionaliteit, bv redirect naar loginpagina
+      window.location.href = 'login.html';
+    });
+
+    // Init
+    displayOrders(orders);
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RBXFits Grote Homepage</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #6fb1fc, #4364f7);
+      color: white;
+    }
+    header {
+      background-color: #1e3c72;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .container {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background-color: white;
+      color: #333;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .card button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      background-color: #4364f7;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #1e3c72;
+      margin-top: 30px;
+    }
+    .admin-access {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .admin-access input {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      width: 200px;
+      margin-right: 10px;
+    }
+    .admin-access button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background-color: #ff6f61;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>RBXFits Grote Homepage</header>
+  <div class="container">
+    <div class="card">
+      <img src="https://via.placeholder.com/250x250?text=RBX+Hoodie" alt="Hoodie">
+      <h3>RBX Hoodie</h3>
+      <p>Prijs: 7 Robux</p>
+      <button onclick="addToCart('RBX Hoodie')">Toevoegen aan winkelmandje</button>
+    </div>
+    <div class="card">
+      <img src="https://via.placeholder.com/250x250?text=RBX+Shirt" alt="Shirt">
+      <h3>RBX Shirt</h3>
+      <p>Prijs: 7 Robux</p>
+      <button onclick="addToCart('RBX Shirt')">Toevoegen aan winkelmandje</button>
+    </div>
+  </div>
+
+  <div class="admin-access">
+    <h3>Admin toegang</h3>
+    <input type="password" id="adminCode" placeholder="Voer toegangscode in...">
+    <button onclick="checkAdminAccess()">Login als admin</button>
+  </div>
+
+  <footer>
+    © 2025 RBXFits. Alle rechten voorbehouden.
+  </footer>
+
+  <script>
+    let cart = [];
+
+    function addToCart(item) {
+      cart.push(item);
+      alert(item + ' is toegevoegd aan je winkelmandje!');
+    }
+
+    function checkAdminAccess() {
+      const code = document.getElementById('adminCode').value;
+      if (code === 'ADMIN123!') {
+        window.location.href = 'admin.html';
+      } else {
+        alert('Toegangscode fout. Probeer opnieuw.');
+      }
+    }
+  </script>
+</body>
+</html>
